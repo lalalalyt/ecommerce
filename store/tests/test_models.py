@@ -26,9 +26,9 @@ class TestProductsModel(TestCase):
     def setUp(self):
         Category.objects.create(name='django', slug='django')
         User.objects.create(username='admin')
-        self.data1 = Product.objects.create(
-            category_id=1, title='django beginner', created_by_id=1, slug='django beginner', price='20.00', image='django')
-    
+        self.data1 = Product.objects.create(category_id=1, title='django beginner',
+                                            created_by_id=1, slug='django-beginner', price='20.00', image='django')
+
     def test_product_model_entry(self):
         '''
         Test Product model data insertion/types/field attributes.
