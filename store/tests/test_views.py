@@ -6,7 +6,13 @@ from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
 
 from store.models import Category, Product
-from store.views import all_products, product_detail
+from store.views import product_all, product_detail
+
+
+@skip("demonstrating skipping")
+class TestSkip(TestCase):
+    def test_skip_exmaple(self):
+        pass
 
 
 class TestViewResponse(TestCase):
@@ -22,6 +28,15 @@ class TestViewResponse(TestCase):
         '''
         Test allowed hosts
         '''
+        response = self.client.get('/', HTTP_HOST='noaddress.com')
+        self.assertEqual(response.status_code, 400)
+        response = self.client.get('/', HTTP_HOST='yourdomain.com')
+        self.assertEqual(response.status_code, 200)
+
+    def test_homepage_url(self):
+        '''
+        Test homepage response status
+        '''
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
@@ -33,7 +48,7 @@ class TestViewResponse(TestCase):
             reverse('store:product_detail', args=['django-beginner']))
         self.assertEqual(response.status_code, 200)
 
-    def test_category_detail_url(self):
+    def test_category_list_url(self):
         '''
         Test category response status
         '''
@@ -41,15 +56,22 @@ class TestViewResponse(TestCase):
             reverse('store:category_list', args=['django']))
         self.assertEqual(response.status_code, 200)
 
+
     def test_homepage_html(self):
+        '''
+        Example: code validation, search HTML for text
+        '''
         request = HttpRequest()
-        response = all_products(request)
+        response = product_all(request)
         html = response.content.decode()
         self.assertEqual(response.status_code, 200)
-        self.assertIn('<title> Home </title>', html)
+        self.assertIn('<title> Secret Garden </title>', html)
         self.assertTrue(html.startswith('\n<!DOCTYPE html>\n'))
 
     def test_view_function(self):
+        '''
+        Example: Using request factory
+        '''
         request = self.factory.get('product/django-beginner')
         response = product_detail(request, 'django-beginner')
         html = response.content.decode()

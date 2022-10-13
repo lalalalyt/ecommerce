@@ -3,20 +3,14 @@ from django.shortcuts import get_object_or_404, render
 from .models import Category, Product
 
 
-def categories(request):
-    return {
-        "categories": Category.objects.all()
-    }
-
-
-def all_products(request):
-    products = Product.objects.all()
+def product_all(request):
+    products = Product.objects.filter(is_active=True)
     return render(request, 'store/home.html', {'products': products})
 
 
 def product_detail(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
-    return render(request, 'store/products/detail.html', {'product': product})
+    return render(request, 'store/products/productDetail.html', {'product': product})
 
 
 def category_list(request, category_slug):
