@@ -1,0 +1,33 @@
+
+
+class Basket():
+    '''
+    A base Basket class, providing some default behaviors that 
+    can be inherited or overrided, as necessary
+    '''
+
+    def __init__(self, request):
+        self.session = request.session
+        basket = self.session.get('sessionKey')
+        if 'sessionKey' not in request.session:
+            basket = self.session['sessionKey'] = {}
+        self.basket = basket
+
+    def add(self,product,Qty):
+        '''
+        Adding and updaing the users basket session data
+        '''
+        product_id=product.id
+
+        if product_id not in self.basket:
+            self.basket[product_id] = {'price': str(product.price),'Qty':Qty}
+        else:
+            self.basket[product_id] = {'price': str(product.price),'Qty':10}
+
+        self.session.modified=True
+
+    def __len__(self):
+        '''
+        Get the basket data and count the qty of items
+        '''
+        return sum(item['Qty'] for item in self.basket.values())

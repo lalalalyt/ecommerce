@@ -1,12 +1,11 @@
-{% extends '../base.html' %}
-{% load static %}
-{% block content %}
+{% extends '../base.html' %} {% load static %} {% block content %}
 
 <div class="container">
     <main class="pt-5">
         <div class="row g-3">
             <div class="col-md-5 col-lg-5 order-md-first bg-light">
-                <img class="img-fluid mx-auto d-block" width="200px" alt="Responsive image" src="{{ product.image.url }}">
+                <img class="img-fluid mx-auto d-block" width="200px" alt="Responsive image"
+                    src="{{ product.image.url }}" />
             </div>
             <div class="col-md-7 col-lg-7 ps-md-3 ps-lg-5">
                 <h1 class="mb-0 h4">{{ product.title }}</h1>
@@ -15,31 +14,54 @@
                 <div class="border">
                     <div class="col border-bottom">
                         <div class="row p-3">
-                            <div class="col-6">Category: {{product.category}}</div>
-                            <div class="col-6 text-end"><span class="h4 fw-bold">${{ product.price }}</span></div>
+                            <div class="col-6">
+                                Category: {{product.category}}
+                            </div>
+                            <div class="col-6 text-end">
+                                <span class="h4 fw-bold">${{ product.price }}</span>
+                            </div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="row p-3">
                             <div class="col-6">
                                 <label for="select">Qty</label>
-                                <select id="select">
-                                    <option value="">1</option>
-                                    <option value="">2</option>
-                                    <option value="">3</option>
-                                    <option value="">4</option>
+                                <select id="select-Qty">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
                                 </select>
-
                             </div>
-                            <div class="col-6 text-end"><button type="button" class="btn btn-secondary btn-sm">Add to
-                                    basket</button></div>
+                            <div class="col-6 text-end">
+                                <button type="button" id="add-button" value="{{product.id}}"
+                                    class="btn btn-secondary btn-sm">
+                                    Add to basket
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-
 </div>
 
-{% endblock  %}
+<script>
+    $(document).on('click', '#add-button', (event) => {
+        event.preventDefault();
+        $.post(
+            '{% url "basket:basket_add" %}', {
+                product_id: $('#add-button').val(),
+                product_Qty: $('#select-Qty').val(),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'post'
+            },
+            (res) => {
+                document.getElementById("basket-qty").innerHTML=res.qty
+            }
+        )
+    })
+</script>
+
+{% endblock %}
