@@ -1,5 +1,10 @@
 
 
+from decimal import Decimal
+from unicodedata import decimal
+from store.models import Product
+
+
 class Basket():
     '''
     A base Basket class, providing some default behaviors that 
@@ -18,13 +23,40 @@ class Basket():
         Adding and updaing the users basket session data
         '''
         product_id=product.id
-
         if product_id not in self.basket:
             self.basket[product_id] = {'price': str(product.price),'Qty':Qty}
-        else:
-            self.basket[product_id] = {'price': str(product.price),'Qty':10}
 
         self.session.modified=True
+    
+    def delete(self,product_id):
+        print("lalalalal",product_id)
+        
+        if product_id in self.basket:
+            del self.basket[product_id]
+
+        self.session.modified=True
+
+
+    
+    def get_total_price(self):
+        return sum(Decimal(item['price'])*item['Qty'] for item in self.basket.values())
+
+    def __iter__(self):
+        '''
+        Collect the product_id in the session data to query the database
+        and return products
+        '''
+        product_ids = self.basket.keys()
+        products = Product.objects.filter(id__in = product_ids)
+        
+        basket = self.basket.copy()
+        for product in products:
+            basket[str(product.id)]['product'] = product
+        for item in basket.values():
+            item['price'] = Decimal(item['price'])
+            item['total_price']=item['price']*item['Qty']
+            yield item 
+
 
     def __len__(self):
         '''

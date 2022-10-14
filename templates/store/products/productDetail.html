@@ -55,10 +55,11 @@
                 product_id: $('#add-button').val(),
                 product_Qty: $('#select-Qty').val(),
                 csrfmiddlewaretoken: "{{csrf_token}}",
-                action: 'post'
+                action: 'add'
             },
             (res) => {
                 document.getElementById("basket-qty").innerHTML=res.qty
+                console.log('success')
             }
         )
     })
