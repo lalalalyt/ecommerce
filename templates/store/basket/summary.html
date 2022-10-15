@@ -34,7 +34,7 @@ Basket Summary
                             <div class="col-12">
                                 <label for="select">Qty</label>
                                 <select id="select{{product.id}}">
-                                    <option selected>{{item.Qty}}</option>
+                                    <option selected>{{item.qty}}</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
@@ -77,9 +77,11 @@ Basket Summary
                 csrfmiddlewaretoken: "{{csrf_token}}",
                 action: "delete",
             },
-            () => {
+            (res) => {
                 console.log("success");
                 $(".product-item[data-id="+productID+"]").remove();
+                document.getElementById("basket-qty").innerHTML=res.totalQty
+                document.getElementById("subtotal").innerHTML=res.subtotal
             }
         );
     });

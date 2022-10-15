@@ -18,13 +18,15 @@ class Basket():
             basket = self.session['sessionKey'] = {}
         self.basket = basket
 
-    def add(self, product, Qty):
+    def add(self, product, qty):
         '''
         Adding and updaing the users basket session data
         '''
-        product_id = product.id
+        product_id = str(product.id)
         if product_id not in self.basket:
-            self.basket[product_id] = {'price': str(product.price), 'Qty': Qty}
+            self.basket[product_id] = {'price': str(product.price), 'qty': qty}
+        else : 
+            self.basket[product_id]['qty']=qty
         self.save()
 
     def delete(self, product_id):
@@ -35,11 +37,11 @@ class Basket():
     def update(self, product_id, qty):
         product_qty=int(qty)
         if product_id in self.basket:
-            self.basket[product_id]['Qty'] = product_qty
+            self.basket[product_id]['qty'] = product_qty
         self.save()
 
     def get_total_price(self):
-        return sum(Decimal(item['price'])*item['Qty'] for item in self.basket.values())
+        return sum(Decimal(item['price'])*item['qty'] for item in self.basket.values())
 
     def __iter__(self):
         '''
@@ -54,14 +56,14 @@ class Basket():
             basket[str(product.id)]['product'] = product
         for item in basket.values():
             item['price'] = Decimal(item['price'])
-            item['total_price'] = item['price']*item['Qty']
+            item['total_price'] = item['price']*item['qty']
             yield item
 
     def __len__(self):
         '''
         Get the basket data and count the qty of items
         '''
-        return sum(item['Qty'] for item in self.basket.values())
+        return sum(item['qty'] for item in self.basket.values())
 
     def save(self):
         self.session.modified = True
