@@ -1,12 +1,14 @@
+from importlib import import_module
 from unittest import skip
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpRequest
-from django.test import Client, RequestFactory, TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 
 from store.models import Category, Product
-from store.views import product_all, product_detail
+from store.views import product_all
 
 
 @skip("demonstrating skipping")
@@ -18,7 +20,6 @@ class TestSkip(TestCase):
 class TestViewResponse(TestCase):
     def setUp(self):
         self.client = Client()
-        self.factory = RequestFactory()
         Category.objects.create(name='django', slug='django')
         User.objects.create(username='admin')
         Product.objects.create(category_id=1, title='django beginner',
@@ -56,25 +57,15 @@ class TestViewResponse(TestCase):
             reverse('store:category_list', args=['django']))
         self.assertEqual(response.status_code, 200)
 
-
     def test_homepage_html(self):
         '''
         Example: code validation, search HTML for text
         '''
         request = HttpRequest()
+        engine = import_module(settings.SESSION_ENGINE)
+        request.session = engine.SessionStore()
         response = product_all(request)
         html = response.content.decode()
         self.assertEqual(response.status_code, 200)
         self.assertIn('<title> Secret Garden </title>', html)
-        self.assertTrue(html.startswith('\n<!DOCTYPE html>\n'))
-
-    def test_view_function(self):
-        '''
-        Example: Using request factory
-        '''
-        request = self.factory.get('product/django-beginner')
-        response = product_detail(request, 'django-beginner')
-        html = response.content.decode()
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('django beginner', html)
         self.assertTrue(html.startswith('\n<!DOCTYPE html>\n'))
