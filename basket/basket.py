@@ -18,26 +18,26 @@ class Basket():
             basket = self.session['sessionKey'] = {}
         self.basket = basket
 
-    def add(self,product,Qty):
+    def add(self, product, Qty):
         '''
         Adding and updaing the users basket session data
         '''
-        product_id=product.id
+        product_id = product.id
         if product_id not in self.basket:
-            self.basket[product_id] = {'price': str(product.price),'Qty':Qty}
+            self.basket[product_id] = {'price': str(product.price), 'Qty': Qty}
+        self.save()
 
-        self.session.modified=True
-    
-    def delete(self,product_id):
-        print("lalalalal",product_id)
-        
+    def delete(self, product_id):
         if product_id in self.basket:
             del self.basket[product_id]
+        self.save()
 
-        self.session.modified=True
+    def update(self, product_id, qty):
+        product_qty=int(qty)
+        if product_id in self.basket:
+            self.basket[product_id]['Qty'] = product_qty
+        self.save()
 
-
-    
     def get_total_price(self):
         return sum(Decimal(item['price'])*item['Qty'] for item in self.basket.values())
 
@@ -47,19 +47,21 @@ class Basket():
         and return products
         '''
         product_ids = self.basket.keys()
-        products = Product.objects.filter(id__in = product_ids)
-        
+        products = Product.objects.filter(id__in=product_ids)
+
         basket = self.basket.copy()
         for product in products:
             basket[str(product.id)]['product'] = product
         for item in basket.values():
             item['price'] = Decimal(item['price'])
-            item['total_price']=item['price']*item['Qty']
-            yield item 
-
+            item['total_price'] = item['price']*item['Qty']
+            yield item
 
     def __len__(self):
         '''
         Get the basket data and count the qty of items
         '''
         return sum(item['Qty'] for item in self.basket.values())
+
+    def save(self):
+        self.session.modified = True
